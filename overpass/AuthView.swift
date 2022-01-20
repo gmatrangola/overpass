@@ -9,7 +9,9 @@ import SwiftUI
 
 struct AuthView: View {
     @StateObject private var authViewModel = AuthViewModel()
-    @EnvironmentObject var authentication: Authentication
+    @State var username = ""
+    @State var passwd = ""
+    
     var body: some View {
         VStack {
             Text("Ford Pass Login")
@@ -22,8 +24,7 @@ struct AuthView: View {
             }
             Button("Log in") {
                 Task.init {
-                    let result = await authViewModel.login()
-                    authentication.updateValidation(success: result)
+                    await authViewModel.login(username: authViewModel.credentials.email, password: authViewModel.credentials.password)
                 }
             }
             .disabled(authViewModel.loginDisabled)
@@ -34,7 +35,7 @@ struct AuthView: View {
         .textFieldStyle(RoundedBorderTextFieldStyle())
         .padding()
         .disabled(authViewModel.showProgressView)
-        .alert(item: $authViewModel.error) { error in
+        .alert(item: $authViewModel.errorStatus) { error in
             Alert(title: Text("Invlid Login"), message: Text(error.localizedDescription))
         }
     }

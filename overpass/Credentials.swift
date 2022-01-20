@@ -7,6 +7,17 @@
 
 import Foundation
 
+struct TokenError: Codable {
+    var errorDescription = ""
+    var error: String = ""
+}
+
+enum AccessError: Error {
+    case noToken
+    case invalidToken
+    case httpError(status: Int, tokenError: TokenError?)
+}
+
 struct Credentials: Codable {
     var email: String = ""
     var password: String = ""

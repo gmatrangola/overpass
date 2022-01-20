@@ -7,11 +7,7 @@
 
 import Foundation
 import KeychainSwift
-
-enum AccessError: Error {
-    case noToken
-    case invalidToken
-}
+import SwiftUI
 
 class APIService {
     static let shared = APIService()
@@ -31,79 +27,89 @@ class APIService {
         return encoder
     }
     
-    func login(credentials: Credentials) async throws {
-        let grantToken = try await requestAuth(credentials: credentials)
-        let authToken = try await requestToken(grant: grantToken)
-        print ("authToken = \(authToken)")
-        let _ = try await getVehicleStatus()
+    func login(username: String, password: String) async throws {
+        let grantToken = try await requestAuth(username: username, password: password)
+        let _ = try await requestToken(grant: grantToken)
     }
     
-    func requestAuth(credentials: Credentials) async throws -> GrantToken {
+    func requestAuth(username: String, password: String) async throws -> GrantToken {
         let url = URL(string: "https://sso.ci.ford.com/oidc/endpoint/default/token")!
         var request = URLRequest(url: url)
 
-        request.setValue("application/x-www-form-urlencoded; charset=utf-8",
-             forHTTPHeaderField: "Content-Type")
-        request.setValue("application/json; charset=utf-8",
-             forHTTPHeaderField: "Accept")
+        request.setValue("application/x-www-form-urlencoded; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        request.setValue("*/*",forHTTPHeaderField: "Accept")
+        request.setValue("en-US,en;q0.9", forHTTPHeaderField: "Accept-Language")
+        request.setValue("FordPass/2 CFNetwork/1312 Darwin/21.0.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("gzip, deflate, br", forHTTPHeaderField: "Accept-Encoding")
+        request.setValue("Basic ZWFpLWNsaWVudDo=", forHTTPHeaderField: "authorization")
         request.httpMethod = "POST"
-        let body : Data = "client_id=9fb503e0-715b-47e8-adfd-ad4b7770f73b&grant_type=password&username=\(credentials.email)&password=\(credentials.password)".data(using: .utf8)!
+        let body : Data = "client_id=9fb503e0-715b-47e8-adfd-ad4b7770f73b&grant_type=password&username=\(username)&password=\(password)".data(using: .utf8)!
         request.httpBody = body
         
         let config = URLSessionConfiguration.default
         let session = URLSession(configuration: config)
         // vs let session = URLSession.shared
           // make the request
-        let (data, _) = try await session.data(for:request)
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
+        let (data, response) = try await session.data(for:request)
+        if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
+            print ("requestAuth \(username) httpResponse.statusCode: \(httpResponse.statusCode) \(String(data: data, encoding: String.Encoding.utf8)!)")
+            throw AccessError.httpError(status: httpResponse.statusCode, tokenError: try decoder.decode(TokenError.self, from: data))
+        }
+        print("requestAuth \(username), data= \(String(decoding: data, as: UTF8.self))")
         let container = try decoder.decode(GrantToken.self, from: data)
         return container
     }
     
     func requestToken(grant: GrantToken) async throws -> AuthToken {
-        print ("Token Request")
-        return try await requestToken(authString: grant.accessToken)
+        return try await requestToken(url: URL(string: "https://api.mps.ford.com/api/oauth2/v1/token")!, tokenField: "code", authString: grant.accessToken)
     }
 
     func refreshToken(auth: AuthToken) async throws -> String {
-        print("Token Refreshed")
-        let result = try await requestToken(authString: auth.refreshToken)
+        let result = try await requestToken(url: URL(string: "https://api.mps.ford.com/api/oauth2/v1/refresh")!, tokenField: "refresh_token", authString: auth.refreshToken)
         print("Token Refreshed \(result)")
         return result.accessToken
     }
-
-    func requestToken(authString: String) async throws -> AuthToken {
-        let url = URL(string: "https://api.mps.ford.com/api/oauth2/v1/token")!
+    
+    func requestToken(url: URL, tokenField: String, authString: String) async throws -> AuthToken {
+        print("requestToken: \(tokenField), \(authString)")
         var request = URLRequest(url: url)
 
-        request.setValue("application/json",
-             forHTTPHeaderField: "content-type")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("*/*",forHTTPHeaderField: "Accept")
         request.setValue(APIService.zoneId["NA"]!, forHTTPHeaderField: "application-id")
+        request.setValue("en-US,en;q0.9", forHTTPHeaderField: "Accept-Language")
+        request.setValue("FordPass/5 CFNetwork/1327.0.4 Darwin/21.2.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("gzip, deflate, br", forHTTPHeaderField: "Accept-Encoding")
+        request.setValue("Basic ZWFpLWNsaWVudDo=", forHTTPHeaderField: "authorization")
+
         request.httpMethod = "PUT"
-        request.httpBody = "{ \"code\": \"\(authString)\"}".data(using: .utf8)
+        request.httpBody = "{ \"\(tokenField)\": \"\(authString)\"}".data(using: .utf8)
         let config = URLSessionConfiguration.default
         let session = URLSession(configuration: config)
         // vs let session = URLSession.shared
           // make the request
-        let (data, _) = try await session.data(for:request)
+        let (data, response) = try await session.data(for:request)
+        if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
+            print ("requestToken \(authString) httpResponse.statusCode: \(httpResponse.statusCode) body: \(String(data: data, encoding:.utf8)!)")
+            throw AccessError.httpError(status: httpResponse.statusCode, tokenError: try jsonDecoder().decode(TokenError.self, from: data))
+        }
         let date = Date()
+        print("requestToken Success: body: \(String(data: data, encoding:.utf8)!)")
         var authToken = try jsonDecoder().decode(AuthToken.self, from: data)
         authToken.expiresAt = Calendar.current.date(byAdding: DateComponents(second: authToken.expiresIn), to: date)!
         authToken.refreshExpiresAt = Calendar.current.date(byAdding: DateComponents(second: authToken.refreshExpiresIn), to: date)!
         keychain.set(try jsonEncoder().encode(authToken), forKey: "token")
-        print("requestToken Succeeded")
         return authToken
-
     }
 
-    func validToken() async throws -> String {
+    func validToken(forceRefresh: Bool = false) async throws -> String {
         let data = keychain.getData("token")
         if let tokenData = data {
             let authToken = try jsonDecoder().decode(AuthToken.self, from: tokenData)
-            print ("validTokeN: authToken = \(authToken)")
-
-            if (authToken.expiresAt! > Date()) {
+            if (forceRefresh || authToken.expiresAt! < Date()) {
+                print("Refreshing Toekn \(forceRefresh) \(authToken.expiresAt!)")
                 return try await refreshToken(auth: authToken)
             }
             else {
@@ -116,30 +122,69 @@ class APIService {
         }
     }
     
-    func getVehicleStatus() async throws {
-        let vin = "VIN_HARDCODE_FOR_TESTING"
-        let data = try await makeFordRequest(url: URL(string: "https://usapi.cv.ford.com/api/vehicles/v4/\(vin)/status")!)
+    func getVehicleStatus(vin: String) async throws -> VehicleStatusMessage {
+        let data = try await makeFordRequest(url: URL(string: "https://usapi.cv.ford.com/api/vehicles/v4/\(vin)/status?lrdt=01-01-1970%2000:00:00")!)
         print ("VehicleStatus = \(String(data: data, encoding:.utf8)!)")
+        return try getApiDecoder().decode(VehicleStatusMessage.self, from: data)
     }
     
-    func makeFordRequest(url: URL, body: Data? = nil) async throws -> Data {
+    func getVehicleInfo(vin: String) async throws -> VehicleInfo {
+        let data = try await makeFordRequest(url: URL(string: "https://usapi.cv.ford.com/api/users/vehicles/\(vin)/detail?lrdt=01-01-1970%2000:00:00")!)
+        print ("VehicleInfo = \(String(data: data, encoding:.utf8)!)")
+        return try getApiDecoder().decode(VehicleInfo.self, from: data)
+    }
+    
+    func getApiDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        dateFormatter.dateFormat = "MM-dd-yyyy HH:mm:ss"
+        decoder.dateDecodingStrategy = .formatted(dateFormatter)
+        return decoder
+    }
+    
+    func makeFordRequest(url: URL, body: Data? = nil, retries: Int = 4) async throws -> Data {
         let authToken = try await validToken()
         var request = URLRequest(url: url)
-        request.setValue("application/json", forHTTPHeaderField: "content-type")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(APIService.zoneId["NA"]!, forHTTPHeaderField: "application-id")
         request.setValue("en-US,en;q=0.9", forHTTPHeaderField: "Accept-Language")
         request.setValue("*/*", forHTTPHeaderField: "Accept")
-        request.setValue("FordPass/5 CFNetwork/1327.0.4 Darwin/21.2.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("FordPass/2 CFNetwork/1312 Darwin/21.0.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("gzip, deflate, br", forHTTPHeaderField: "Accept-Encoding")
         request.setValue(authToken, forHTTPHeaderField: "auth-token")
-
+        request.httpMethod = "GET"
+    
         if (body != nil) {
             request.httpBody = try jsonEncoder().encode(body)
         }
 
         let config = URLSessionConfiguration.default
         let session = URLSession(configuration: config)
-        let (data, _) = try await session.data(for:request)
-        return data
+        
+        print("makeFordRequest session = \(session.debugDescription) request = \(request.allHTTPHeaderFields) authToken = \(authToken)")
+        let (data, response) = try await session.data(for:request)
+        if let httpResponse = response as? HTTPURLResponse {
+            if (httpResponse.statusCode == 200) {
+                return data
+            }
+            else if (httpResponse.statusCode == 401 && retries > 0) {
+                print ("httpResponse.statusCode: \(httpResponse.statusCode)")
+                let _ = try await validToken(forceRefresh: true)
+                return try await makeFordRequest(url: url, body: body, retries: retries-1)
+            }
+            else {
+                if (retries > 0) {
+                    return try await makeFordRequest(url: url, body: body, retries: retries-1)
+                }
+                else {
+                    throw RestError.httpError(status: httpResponse.statusCode, body: body)
+                }
+            }
+        }
+        else {
+            return data
+        }
    }
     
 }

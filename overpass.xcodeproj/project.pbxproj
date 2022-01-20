@@ -7,13 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6C6648C0278E3B5100F78B89 /* SwAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6C6648BF278E3B5100F78B89 /* SwAuth */; };
+		6C6736E02795371E008818FF /* FordModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C6736DF2795371E008818FF /* FordModel.swift */; };
 		6CAA2317278D10AA00FF172E /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6CAA2316278D10AA00FF172E /* KeychainSwift */; };
 		6CB25C0727838EED0086DEF0 /* overpassApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C0627838EED0086DEF0 /* overpassApp.swift */; };
 		6CB25C0927838EED0086DEF0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C0827838EED0086DEF0 /* ContentView.swift */; };
 		6CB25C0B27838EEF0086DEF0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6CB25C0A27838EEF0086DEF0 /* Assets.xcassets */; };
 		6CB25C0E27838EEF0086DEF0 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6CB25C0D27838EEF0086DEF0 /* Preview Assets.xcassets */; };
-		6CB25C1027838EEF0086DEF0 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C0F27838EEF0086DEF0 /* Persistence.swift */; };
 		6CB25C1327838EEF0086DEF0 /* overpass.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C1127838EEF0086DEF0 /* overpass.xcdatamodeld */; };
 		6CB25C1D27838EEF0086DEF0 /* overpassTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C1C27838EEF0086DEF0 /* overpassTests.swift */; };
 		6CB25C2727838EEF0086DEF0 /* overpassUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C2627838EEF0086DEF0 /* overpassUITests.swift */; };
@@ -44,12 +43,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6C6736DF2795371E008818FF /* FordModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FordModel.swift; sourceTree = "<group>"; };
 		6CB25C0327838EED0086DEF0 /* overpass.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = overpass.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CB25C0627838EED0086DEF0 /* overpassApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = overpassApp.swift; sourceTree = "<group>"; };
 		6CB25C0827838EED0086DEF0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6CB25C0A27838EEF0086DEF0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6CB25C0D27838EEF0086DEF0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		6CB25C0F27838EEF0086DEF0 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		6CB25C1227838EEF0086DEF0 /* overpass.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = overpass.xcdatamodel; sourceTree = "<group>"; };
 		6CB25C1827838EEF0086DEF0 /* overpassTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = overpassTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CB25C1C27838EEF0086DEF0 /* overpassTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = overpassTests.swift; sourceTree = "<group>"; };
@@ -69,7 +68,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6C6648C0278E3B5100F78B89 /* SwAuth in Frameworks */,
 				6CAA2317278D10AA00FF172E /* KeychainSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -120,11 +118,12 @@
 				6CB25C3D2783AEBA0086DEF0 /* AuthView.swift */,
 				6CB25C3F2783B00C0086DEF0 /* AuthViewModel.swift */,
 				6CB25C412783B2100086DEF0 /* Authentication.swift */,
+				6CB25C3727839CC00086DEF0 /* VehicleView.swift */,
 				6CB25C0A27838EEF0086DEF0 /* Assets.xcassets */,
-				6CB25C0F27838EEF0086DEF0 /* Persistence.swift */,
 				6CB25C1127838EEF0086DEF0 /* overpass.xcdatamodeld */,
 				6CB25C0C27838EEF0086DEF0 /* Preview Content */,
 				6CB25C3B2783A13B0086DEF0 /* APIService.swift */,
+				6C6736DF2795371E008818FF /* FordModel.swift */,
 			);
 			path = overpass;
 			sourceTree = "<group>";
@@ -133,7 +132,6 @@
 			isa = PBXGroup;
 			children = (
 				6CB25C0D27838EEF0086DEF0 /* Preview Assets.xcassets */,
-				6CB25C3727839CC00086DEF0 /* VehicleView.swift */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -173,7 +171,6 @@
 			name = overpass;
 			packageProductDependencies = (
 				6CAA2316278D10AA00FF172E /* KeychainSwift */,
-				6C6648BF278E3B5100F78B89 /* SwAuth */,
 			);
 			productName = overpass;
 			productReference = 6CB25C0327838EED0086DEF0 /* overpass.app */;
@@ -249,7 +246,6 @@
 			mainGroup = 6CB25BFA27838EED0086DEF0;
 			packageReferences = (
 				6CAA2315278D10AA00FF172E /* XCRemoteSwiftPackageReference "keychain-swift" */,
-				6C6648BE278E3B5100F78B89 /* XCRemoteSwiftPackageReference "SwAuth" */,
 			);
 			productRefGroup = 6CB25C0427838EED0086DEF0 /* Products */;
 			projectDirPath = "";
@@ -295,9 +291,9 @@
 			files = (
 				6CB25C3A2783A0EE0086DEF0 /* Credentials.swift in Sources */,
 				6CB25C3C2783A13B0086DEF0 /* APIService.swift in Sources */,
+				6C6736E02795371E008818FF /* FordModel.swift in Sources */,
 				6CB25C1327838EEF0086DEF0 /* overpass.xcdatamodeld in Sources */,
 				6CB25C422783B2100086DEF0 /* Authentication.swift in Sources */,
-				6CB25C1027838EEF0086DEF0 /* Persistence.swift in Sources */,
 				6CB25C0927838EED0086DEF0 /* ContentView.swift in Sources */,
 				6CB25C3827839CC00086DEF0 /* VehicleView.swift in Sources */,
 				6CB25C3E2783AEBA0086DEF0 /* AuthView.swift in Sources */,
@@ -631,14 +627,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		6C6648BE278E3B5100F78B89 /* XCRemoteSwiftPackageReference "SwAuth" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Colaski/SwAuth";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.0;
-			};
-		};
 		6CAA2315278D10AA00FF172E /* XCRemoteSwiftPackageReference "keychain-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/evgenyneu/keychain-swift";
@@ -650,11 +638,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6C6648BF278E3B5100F78B89 /* SwAuth */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6C6648BE278E3B5100F78B89 /* XCRemoteSwiftPackageReference "SwAuth" */;
-			productName = SwAuth;
-		};
 		6CAA2316278D10AA00FF172E /* KeychainSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 6CAA2315278D10AA00FF172E /* XCRemoteSwiftPackageReference "keychain-swift" */;
