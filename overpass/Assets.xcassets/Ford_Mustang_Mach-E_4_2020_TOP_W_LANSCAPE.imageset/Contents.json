@@ -1,0 +1,21 @@
+{
+  "images" : [
+    {
+      "filename" : "Ford_Mustang_Mach-E_4_2020_blueprint_color_0005.jpg",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

@@ -14,12 +14,12 @@ class VehicleApi : RestApi {
 
     func getInfo() async throws {
         let data = try await makeFordRequest(string: "https://usapi.cv.ford.com/api/vehicles/v4/status?lrdt=01-01-1970%2000:00:00", retries: 1)
-//        print ("--- getInfo = \(String(data: data, encoding:.utf8)!)")
+        print ("--- getInfo = \(String(data: data, encoding:.utf8)!)")
     }
     
     func getVehicleStatus(vin: String) async throws -> VehicleStatusMessage {
         let data = try await makeFordRequest(string: "https://usapi.cv.ford.com/api/vehicles/v4/\(vin)/status?lrdt=01-01-1970%2000:00:00")
-//        print ("VehicleStatus = \(String(data: data, encoding:.utf8)!)")
+        print ("VehicleStatus = \(String(data: data, encoding:.utf8)!)")
         let message = try jsonDecoder().decode(VehicleStatusMessage.self, from: data)
         if let status = message.status {
             if status == 200 {
@@ -32,7 +32,7 @@ class VehicleApi : RestApi {
     
     func getVehicleInfo(vin: String) async throws -> VehicleInfo {
         let data = try await makeFordRequest(string: "https://usapi.cv.ford.com/api/users/vehicles/\(vin)/detail?lrdt=01-01-1970%2000:00:00")
-//        print ("VehicleInfo = \(String(data: data, encoding:.utf8)!)")
+        print ("VehicleInfo = \(String(data: data, encoding:.utf8)!)")
         return try jsonDecoder().decode(VehicleInfo.self, from: data)
     }
 }

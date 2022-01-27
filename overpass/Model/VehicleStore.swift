@@ -16,10 +16,20 @@ class VehicleStore : ObservableObject {
     @Published var vehicleInfo: VehicleInfo?
     private var refreshTimer : Timer?
     
-    init() {
-        let defaults = UserDefaults.standard
-        currentVin = defaults.string(forKey: "currentVin") ?? ""
-        readData()
+    init(_ debug: Bool = false) {
+        if (!debug) {
+            let defaults = UserDefaults.standard
+            currentVin = defaults.string(forKey: "currentVin") ?? ""
+            readData()
+        }
+        else {
+            vins = ["123123123"]
+            currentVin = "123123123"
+            vehicleStatus = VehicleStatus()
+            vehicleStatus?.lockStatus = Status(value: "LOCKED")
+            vehicleStatus?.remoteStartStatus = IntStatus(value: 0)
+            vehicleStatus?.ignitionStatus = Status(value: "Off")
+        }
     }
     
     func addVin(vin: String) {

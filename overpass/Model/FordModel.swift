@@ -69,7 +69,13 @@ struct StringOrDouble: Codable {
             value = Double(string)
             return
         }
+        print("Unknown StringOrDouble \(try decoder.singleValueContainer().codingPath)")
         throw Error.couldNotFindStringOrDouble
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(value)
     }
     enum Error: Swift.Error {
         case couldNotFindStringOrDouble
