@@ -1,20 +1,18 @@
 //
-//  APIService.swift
+//  AuthApi.swift
 //  overpass
 //
-//  Created by Geoffrey Matrangola on 1/3/22.
+//  Created by Geoffrey Matrangola on 1/20/22.
 //
 
 import Foundation
 import KeychainSwift
-import SwiftUI
 
-class APIService {
-    static let shared = APIService()
-    static let zoneId = ["UK_Europe": "1E8C7794-FF5F-49BC-9596-A1E0C86C5B19",
-                         "Australia": "5C80A6BB-CF0D-4A30-BDBF-FC804B5C1A98",
-                         "NA": "71A3AD0A-CF46-4CCF-B473-FC7FE5BC4592"]
+class AuthApi {
+    static let shared = AuthApi()
+    
     let keychain = KeychainSwift()
+    
     func jsonDecoder() throws -> JSONDecoder {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -78,7 +76,7 @@ class APIService {
 
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("*/*",forHTTPHeaderField: "Accept")
-        request.setValue(APIService.zoneId["NA"]!, forHTTPHeaderField: "application-id")
+        request.setValue(Zones.zoneId["NA"]!, forHTTPHeaderField: "application-id")
         request.setValue("en-US,en;q0.9", forHTTPHeaderField: "Accept-Language")
         request.setValue("FordPass/5 CFNetwork/1327.0.4 Darwin/21.2.0", forHTTPHeaderField: "User-Agent")
         request.setValue("gzip, deflate, br", forHTTPHeaderField: "Accept-Encoding")
@@ -108,6 +106,7 @@ class APIService {
         let data = keychain.getData("token")
         if let tokenData = data {
             let authToken = try jsonDecoder().decode(AuthToken.self, from: tokenData)
+            print ("Refresh Token expires \(authToken.expiresAt!.description)")
             if (forceRefresh || authToken.expiresAt! < Date()) {
                 print("Refreshing Toekn \(forceRefresh) \(authToken.expiresAt!)")
                 return try await refreshToken(auth: authToken)
@@ -121,70 +120,5 @@ class APIService {
             throw AccessError.noToken
         }
     }
-    
-    func getVehicleStatus(vin: String) async throws -> VehicleStatusMessage {
-        let data = try await makeFordRequest(url: URL(string: "https://usapi.cv.ford.com/api/vehicles/v4/\(vin)/status?lrdt=01-01-1970%2000:00:00")!)
-        print ("VehicleStatus = \(String(data: data, encoding:.utf8)!)")
-        return try getApiDecoder().decode(VehicleStatusMessage.self, from: data)
-    }
-    
-    func getVehicleInfo(vin: String) async throws -> VehicleInfo {
-        let data = try await makeFordRequest(url: URL(string: "https://usapi.cv.ford.com/api/users/vehicles/\(vin)/detail?lrdt=01-01-1970%2000:00:00")!)
-        print ("VehicleInfo = \(String(data: data, encoding:.utf8)!)")
-        return try getApiDecoder().decode(VehicleInfo.self, from: data)
-    }
-    
-    func getApiDecoder() -> JSONDecoder {
-        let decoder = JSONDecoder()
-        let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
-        dateFormatter.dateFormat = "MM-dd-yyyy HH:mm:ss"
-        decoder.dateDecodingStrategy = .formatted(dateFormatter)
-        return decoder
-    }
-    
-    func makeFordRequest(url: URL, body: Data? = nil, retries: Int = 4) async throws -> Data {
-        let authToken = try await validToken()
-        var request = URLRequest(url: url)
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(APIService.zoneId["NA"]!, forHTTPHeaderField: "application-id")
-        request.setValue("en-US,en;q=0.9", forHTTPHeaderField: "Accept-Language")
-        request.setValue("*/*", forHTTPHeaderField: "Accept")
-        request.setValue("FordPass/2 CFNetwork/1312 Darwin/21.0.0", forHTTPHeaderField: "User-Agent")
-        request.setValue("gzip, deflate, br", forHTTPHeaderField: "Accept-Encoding")
-        request.setValue(authToken, forHTTPHeaderField: "auth-token")
-        request.httpMethod = "GET"
-    
-        if (body != nil) {
-            request.httpBody = try jsonEncoder().encode(body)
-        }
 
-        let config = URLSessionConfiguration.default
-        let session = URLSession(configuration: config)
-        
-        print("makeFordRequest session = \(session.debugDescription) request = \(request.allHTTPHeaderFields) authToken = \(authToken)")
-        let (data, response) = try await session.data(for:request)
-        if let httpResponse = response as? HTTPURLResponse {
-            if (httpResponse.statusCode == 200) {
-                return data
-            }
-            else if (httpResponse.statusCode == 401 && retries > 0) {
-                print ("httpResponse.statusCode: \(httpResponse.statusCode)")
-                let _ = try await validToken(forceRefresh: true)
-                return try await makeFordRequest(url: url, body: body, retries: retries-1)
-            }
-            else {
-                if (retries > 0) {
-                    return try await makeFordRequest(url: url, body: body, retries: retries-1)
-                }
-                else {
-                    throw RestError.httpError(status: httpResponse.statusCode, body: body)
-                }
-            }
-        }
-        else {
-            return data
-        }
-   }
-    
 }

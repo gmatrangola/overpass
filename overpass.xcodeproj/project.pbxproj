@@ -19,10 +19,15 @@
 		6CB25C2927838EEF0086DEF0 /* overpassUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C2827838EEF0086DEF0 /* overpassUITestsLaunchTests.swift */; };
 		6CB25C3827839CC00086DEF0 /* VehicleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C3727839CC00086DEF0 /* VehicleView.swift */; };
 		6CB25C3A2783A0EE0086DEF0 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C392783A0EE0086DEF0 /* Credentials.swift */; };
-		6CB25C3C2783A13B0086DEF0 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C3B2783A13B0086DEF0 /* APIService.swift */; };
+		6CB25C3C2783A13B0086DEF0 /* VehicleApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C3B2783A13B0086DEF0 /* VehicleApi.swift */; };
 		6CB25C3E2783AEBA0086DEF0 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C3D2783AEBA0086DEF0 /* AuthView.swift */; };
 		6CB25C402783B00C0086DEF0 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C3F2783B00C0086DEF0 /* AuthViewModel.swift */; };
 		6CB25C422783B2100086DEF0 /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C412783B2100086DEF0 /* Authentication.swift */; };
+		6CCFF620279FA29000582514 /* VehicleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CCFF61F279FA29000582514 /* VehicleStore.swift */; };
+		6CE2E2B62799A68200AA0ABE /* AuthApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE2E2B52799A68200AA0ABE /* AuthApi.swift */; };
+		6CE2E2B82799A82200AA0ABE /* Zones.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE2E2B72799A82200AA0ABE /* Zones.swift */; };
+		6CE2E2BA2799A90800AA0ABE /* UserApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE2E2B92799A90800AA0ABE /* UserApi.swift */; };
+		6CE2E2BC2799A94300AA0ABE /* RestApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE2E2BB2799A94300AA0ABE /* RestApi.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,10 +62,15 @@
 		6CB25C2827838EEF0086DEF0 /* overpassUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = overpassUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		6CB25C3727839CC00086DEF0 /* VehicleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleView.swift; sourceTree = "<group>"; };
 		6CB25C392783A0EE0086DEF0 /* Credentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = "<group>"; };
-		6CB25C3B2783A13B0086DEF0 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		6CB25C3B2783A13B0086DEF0 /* VehicleApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleApi.swift; sourceTree = "<group>"; };
 		6CB25C3D2783AEBA0086DEF0 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		6CB25C3F2783B00C0086DEF0 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		6CB25C412783B2100086DEF0 /* Authentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
+		6CCFF61F279FA29000582514 /* VehicleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleStore.swift; sourceTree = "<group>"; };
+		6CE2E2B52799A68200AA0ABE /* AuthApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthApi.swift; sourceTree = "<group>"; };
+		6CE2E2B72799A82200AA0ABE /* Zones.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zones.swift; sourceTree = "<group>"; };
+		6CE2E2B92799A90800AA0ABE /* UserApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserApi.swift; sourceTree = "<group>"; };
+		6CE2E2BB2799A94300AA0ABE /* RestApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestApi.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,17 +123,12 @@
 			isa = PBXGroup;
 			children = (
 				6CB25C0627838EED0086DEF0 /* overpassApp.swift */,
-				6CB25C0827838EED0086DEF0 /* ContentView.swift */,
-				6CB25C392783A0EE0086DEF0 /* Credentials.swift */,
-				6CB25C3D2783AEBA0086DEF0 /* AuthView.swift */,
-				6CB25C3F2783B00C0086DEF0 /* AuthViewModel.swift */,
-				6CB25C412783B2100086DEF0 /* Authentication.swift */,
-				6CB25C3727839CC00086DEF0 /* VehicleView.swift */,
+				6CE2E2B32799A5D200AA0ABE /* UI */,
+				6CE2E2B42799A63200AA0ABE /* Model */,
+				6CE2E2B22799A5AA00AA0ABE /* API */,
 				6CB25C0A27838EEF0086DEF0 /* Assets.xcassets */,
 				6CB25C1127838EEF0086DEF0 /* overpass.xcdatamodeld */,
 				6CB25C0C27838EEF0086DEF0 /* Preview Content */,
-				6CB25C3B2783A13B0086DEF0 /* APIService.swift */,
-				6C6736DF2795371E008818FF /* FordModel.swift */,
 			);
 			path = overpass;
 			sourceTree = "<group>";
@@ -151,6 +156,40 @@
 				6CB25C2827838EEF0086DEF0 /* overpassUITestsLaunchTests.swift */,
 			);
 			path = overpassUITests;
+			sourceTree = "<group>";
+		};
+		6CE2E2B22799A5AA00AA0ABE /* API */ = {
+			isa = PBXGroup;
+			children = (
+				6CE2E2B52799A68200AA0ABE /* AuthApi.swift */,
+				6CE2E2BB2799A94300AA0ABE /* RestApi.swift */,
+				6CB25C3B2783A13B0086DEF0 /* VehicleApi.swift */,
+				6CE2E2B92799A90800AA0ABE /* UserApi.swift */,
+			);
+			path = API;
+			sourceTree = "<group>";
+		};
+		6CE2E2B32799A5D200AA0ABE /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				6CB25C3D2783AEBA0086DEF0 /* AuthView.swift */,
+				6CB25C3F2783B00C0086DEF0 /* AuthViewModel.swift */,
+				6CB25C3727839CC00086DEF0 /* VehicleView.swift */,
+				6CB25C0827838EED0086DEF0 /* ContentView.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		6CE2E2B42799A63200AA0ABE /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				6C6736DF2795371E008818FF /* FordModel.swift */,
+				6CB25C412783B2100086DEF0 /* Authentication.swift */,
+				6CB25C392783A0EE0086DEF0 /* Credentials.swift */,
+				6CE2E2B72799A82200AA0ABE /* Zones.swift */,
+				6CCFF61F279FA29000582514 /* VehicleStore.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -290,14 +329,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				6CB25C3A2783A0EE0086DEF0 /* Credentials.swift in Sources */,
-				6CB25C3C2783A13B0086DEF0 /* APIService.swift in Sources */,
+				6CB25C3C2783A13B0086DEF0 /* VehicleApi.swift in Sources */,
 				6C6736E02795371E008818FF /* FordModel.swift in Sources */,
 				6CB25C1327838EEF0086DEF0 /* overpass.xcdatamodeld in Sources */,
+				6CE2E2B62799A68200AA0ABE /* AuthApi.swift in Sources */,
 				6CB25C422783B2100086DEF0 /* Authentication.swift in Sources */,
 				6CB25C0927838EED0086DEF0 /* ContentView.swift in Sources */,
 				6CB25C3827839CC00086DEF0 /* VehicleView.swift in Sources */,
 				6CB25C3E2783AEBA0086DEF0 /* AuthView.swift in Sources */,
+				6CE2E2B82799A82200AA0ABE /* Zones.swift in Sources */,
+				6CE2E2BC2799A94300AA0ABE /* RestApi.swift in Sources */,
 				6CB25C0727838EED0086DEF0 /* overpassApp.swift in Sources */,
+				6CE2E2BA2799A90800AA0ABE /* UserApi.swift in Sources */,
+				6CCFF620279FA29000582514 /* VehicleStore.swift in Sources */,
 				6CB25C402783B00C0086DEF0 /* AuthViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

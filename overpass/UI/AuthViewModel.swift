@@ -12,20 +12,29 @@ class AuthViewModel : ObservableObject {
     @Published var credentials = Credentials()
     @Published var showProgressView = false
     @Published var errorStatus: Authentication.AuthenticationError?
+    @Published var vin = ""
     
     var loginDisabled: Bool {
-        credentials.email.isEmpty || credentials.password.isEmpty
+        credentials.email.isEmpty || credentials.password.isEmpty || !validVin()
     }
     
-    func login(username: String, password: String) async {
+    private func validVin() -> Bool {
+        let alhpanumRegex = #"[A-Z0-9]*"#
+        return !vin.isEmpty && vin.count == 17 && vin.range(of: alhpanumRegex, options: .regularExpression) != nil
+    }
+    
+    func login(username: String, password: String) async -> Bool {
+        var success = false
         DispatchQueue.main.async { self.showProgressView = true }
         do {
-            try await APIService.shared.login(username: username, password: password)
+            try await AuthApi.shared.login(username: username, password: password)
+            success = true
         }
         catch {
             print("--- Unexpected error \(error)")
             self.errorStatus = Authentication.AuthenticationError.invalidCredentials
         }
         DispatchQueue.main.async { self.showProgressView = false }
+        return success
     }
 }

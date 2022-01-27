@@ -8,10 +8,8 @@
 import SwiftUI
 
 struct AuthView: View {
+    @StateObject var vehicleStore: VehicleStore
     @StateObject private var authViewModel = AuthViewModel()
-    @State var username = ""
-    @State var passwd = ""
-    
     var body: some View {
         VStack {
             Text("Ford Pass Login")
@@ -19,12 +17,19 @@ struct AuthView: View {
             TextField("Email Address", text: $authViewModel.credentials.email)
                 .keyboardType(.emailAddress)
             SecureField("Password", text: $authViewModel.credentials.password)
-            if authViewModel.showProgressView {
+            TextField("VIN", text: $authViewModel.vin)
+                .disableAutocorrection(true)
+                .autocapitalization(.allCharacters)
+            if (authViewModel.showProgressView) {
                 ProgressView()
             }
             Button("Log in") {
                 Task.init {
-                    await authViewModel.login(username: authViewModel.credentials.email, password: authViewModel.credentials.password)
+                    let success = await authViewModel.login(username: authViewModel.credentials.email, password: authViewModel.credentials.password)
+                    if success {
+                        vehicleStore.addVin(vin: authViewModel.vin)
+                        vehicleStore.currentVin = authViewModel.vin
+                    }
                 }
             }
             .disabled(authViewModel.loginDisabled)
@@ -43,6 +48,6 @@ struct AuthView: View {
 
 struct AuthView_Previews: PreviewProvider {
     static var previews: some View {
-        AuthView()
+        AuthView(vehicleStore: VehicleStore())
     }
 }

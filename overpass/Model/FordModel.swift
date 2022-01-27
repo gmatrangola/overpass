@@ -8,7 +8,8 @@
 import Foundation
 
 enum RestError : Error {
-    case httpError(status: Int, body: Data?)
+    case httpError(status: Int, _ body: Data? = nil)
+    case statusError(status: Int, _ body: Data)
 }
 
 struct VehicleStatusError : Codable {
@@ -56,18 +57,16 @@ struct BoolStatus: Codable {
     var timestamp: Date?
 }
 
-enum StringOrDouble: Decodable {
-    
-    case string(String)
-    case double(Double)
+struct StringOrDouble: Codable {
+    var value: Double?
     
     init(from decoder: Decoder) throws {
         if let double = try? decoder.singleValueContainer().decode(Double.self) {
-            self = .double(double)
+            value = double
             return
         }
         if let string = try? decoder.singleValueContainer().decode(String.self) {
-            self = .string(string)
+            value = Double(string)
             return
         }
         throw Error.couldNotFindStringOrDouble
@@ -77,7 +76,7 @@ enum StringOrDouble: Decodable {
     }
 }
 
-struct Gps: Decodable {
+struct Gps: Codable {
     var latitude: StringOrDouble?
     var longitude: StringOrDouble?
     var gpsState: String?
@@ -133,7 +132,7 @@ struct CcsStatus: Codable {
     var contacts: Int?
 }
 
-struct VehicleStatusMessage: Decodable {
+struct VehicleStatusMessage: Codable {
     var status: Int?
     var vehiclestatus: VehicleStatus?
     var version: String?
@@ -161,7 +160,7 @@ struct WindowPosition: Codable {
     var rearPassWindowPos: Status?
 }
 
-struct VehicleStatus : Decodable {
+struct VehicleStatus : Codable {
     var vin :  String?
     var PrmtAlarmEvent: Status?
     var lockStatus: Status?
@@ -263,4 +262,10 @@ struct VehicleInfo : Codable {
     var status: Int?
     var vehicle: Vehicle?
     var version: String?
+}
+
+struct VehicleData : Codable {
+    var vin: String?
+    var vehicleInfo: VehicleInfo?
+    var latestStatus: VehicleStatus?
 }
