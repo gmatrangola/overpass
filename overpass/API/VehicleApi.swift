@@ -35,4 +35,35 @@ class VehicleApi : RestApi {
         print ("VehicleInfo = \(String(data: data, encoding:.utf8)!)")
         return try jsonDecoder().decode(VehicleInfo.self, from: data)
     }
+    
+    func lock(vin: String) async throws -> CommandResponse {
+        let data = try await makeFordRequest(string: "https://usapi.cv.ford.com/api/vehicles/v2/\(vin)/doors/lock", method: "PUT", body: "")
+        print ("lock = \(String(data: data, encoding:.utf8)!)")
+        return try jsonDecoder().decode(CommandResponse.self, from: data)
+    }
+
+    func unlock(vin: String) async throws -> CommandResponse {
+        let data = try await makeFordRequest(string: "https://usapi.cv.ford.com/api/vehicles/v2/\(vin)/doors/lock", method: "DELETE", body: "")
+        print ("unlock = \(String(data: data, encoding:.utf8)!)")
+        return try jsonDecoder().decode(CommandResponse.self, from: data)
+    }
+    
+    func remoteStart(vin: String) async throws -> CommandResponse {
+        let data = try await makeFordRequest(string: "https://usapi.cv.ford.com/api/vehicles/v2/\(vin)/engine/start", method: "PUT", body: "")
+        print ("remoteStart = \(String(data: data, encoding:.utf8)!)")
+        return try jsonDecoder().decode(CommandResponse.self, from: data)
+    }
+    
+    func remoteStartCancel(vin: String) async throws -> CommandResponse {
+        let data = try await makeFordRequest(string: "https://usapi.cv.ford.com/api/vehicles/v2/\(vin)/engine/start", method: "DELETE", body: "")
+        print ("remoteStart = \(String(data: data, encoding:.utf8)!)")
+        return try jsonDecoder().decode(CommandResponse.self, from: data)
+    }
+    
+    // type = /door/type or engine/start
+    func getCommandStatus(vin: String, version: Int, commandId: String, type: String) async throws -> LockCommandStatus {
+        let data = try await makeFordRequest(string: "https://usapi.cv.ford.com/api/vehicles/v\(version)/\(vin)/\(type)/\(commandId)")
+        print ("getLockStatus = \(String(data: data, encoding:.utf8)!)")
+        return try jsonDecoder().decode(LockCommandStatus.self, from: data)
+    }
 }

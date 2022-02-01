@@ -22,10 +22,10 @@ struct VehicleView: View {
         }
         
         .onAppear {
-            vehicleStore.startRefresTimer()
+            vehicleStore.startRefreshTask()
         }
         .onDisappear {
-            vehicleStore.stopRefreshTimer()
+            vehicleStore.stopRefreshTask()
         }
     }
 }
@@ -37,24 +37,42 @@ struct LockStatus: View {
             Button(action: toggleLock) {
                 Text(lockStatus()).foregroundColor(lockColor())
             }
+            .disabled(lockDisableStatus())
         }
     }
     
     fileprivate func toggleLock() {
-        // TODO Lock/unlock commands
+        vehicleStore.toggleLock()
     }
     
     fileprivate func lockStatus() -> String {
         var status = "Unknown"
-        if let lock = vehicleStore.vehicleStatus?.lockStatus?.value {
-            if lock == "LOCKED" {
-                status = "Locked"
-            }
-            else {
-                status = "Unlocked"
-            }
+        switch (vehicleStore.lockState) {
+        case .unlocked:
+            status = "Unlocked"
+        case .locked:
+            status = "Locked"
+        case .unlocking:
+            status = "Unlocking"
+        case .locking:
+            status = "Locking"
+        case .lockError:
+            status = "Lock Error"
+        case .unknown:
+            status = "Unknown"
         }
         return status
+    }
+    
+    fileprivate func lockDisableStatus() -> Bool {
+        switch (vehicleStore.lockState) {
+        case .unknown: fallthrough
+        case .locking: fallthrough
+        case .unlocking:
+            return true
+        default:
+            return false
+        }
     }
     
     fileprivate func lockColor() -> Color {
@@ -76,26 +94,36 @@ struct BootStatus: View {
     @StateObject var vehicleStore : VehicleStore
     var body: some View {
         if vehicleStore.vehicleStatus != nil {
-            Text(bootStatus()).foregroundColor(bootColor())
+            Button(action: initiateRemoteStart) {
+                Text(bootStatus()).foregroundColor(bootColor())
+            }
+            .disabled(startDisabledStatus())
         }
     }
+    
+    fileprivate func initiateRemoteStart() {
+        vehicleStore.initiateRemoteStart()
+    }
+    
     fileprivate func bootStatus() -> String {
         var status = "Unknown"
-        if let ignition = vehicleStore.vehicleStatus?.ignitionStatus?.value {
-            switch ignition {
-            case "Run": status = "Running"
-            case "Off": status = "Off"
-            default:
-                status = "---"
-            }
-        }
-        if let remote = vehicleStore.vehicleStatus?.remoteStartStatus?.value {
-            if (remote == 1) {
-                status = "R/S"
-            }
+        switch vehicleStore.remoteStartState {
+        case .starting: status = "Starting"
+        case .started: status = "Started"
+        case .running: status = "Running"
+        case .off: status = "Off"
+        default: status = "Unknown"
         }
         return status
     }
+    
+    fileprivate func startDisabledStatus() -> Bool {
+        switch vehicleStore.remoteStartState {
+        case .running: return true
+        default: return false
+        }
+    }
+    
     fileprivate func bootColor() -> Color {
         var status = Color.white
         if let ignition = vehicleStore.vehicleStatus?.ignitionStatus?.value {

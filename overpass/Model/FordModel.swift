@@ -10,6 +10,7 @@ import Foundation
 enum RestError : Error {
     case httpError(status: Int, _ body: Data? = nil)
     case statusError(status: Int, _ body: Data)
+    case responseError(status: Int?, _ description: String)
 }
 
 struct VehicleStatusError : Codable {
@@ -274,4 +275,35 @@ struct VehicleData : Codable {
     var vin: String?
     var vehicleInfo: VehicleInfo?
     var latestStatus: VehicleStatus?
+}
+
+struct CommandResponse: Codable {
+    // text: "{"$id":"1","commandId":"d7ed1677-6258-4390-8178-cf853259489e","status":200,"version":"1.0.0"}"
+    var commandId: String?
+    var status: Int?
+    var version: String?
+}
+
+struct LockCommandStatus: Codable {
+    // {"$id":"1","remoteLockFailureReasons":null,"eventData":{"$id":"2","warning":0,"DoorPresenceWarning":0,"DoorStatuses":{"$id":"3","$values":[]},"DoorPresentStatuses":{"$id":"4","$values":[]}},"errorDetailCode":null,"status":200,"version":"3.0.0"}
+    var remoteLockFailureReasons: String?
+    var errorDetailCode: String?
+    var status: Int?
+    var version: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case remoteLockFailureReasons, errorDetailCode, status, version
+    }
+}
+
+struct RemoteStartStatus: Codable {
+    //  {"$id":"1","remoteStartFailures":null,"DoorPresenceWarning":0,"DoorPresentStatuses":{"$id":"2","$values":[]},"errorDetailCode":null,"status":200,"version":"4.0.0"}
+    var remoteStartFailures: String?
+    var errorDetailCode: String?
+    var status: Int?
+    var version: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case remoteStartFailures, errorDetailCode, status, version
+    }
 }
