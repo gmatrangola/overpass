@@ -10,11 +10,14 @@ import SwiftUI
 struct VehicleView: View {
     @StateObject var vehicleStore : VehicleStore
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             Image("Ford_Mustang_Mach-E_4_2020_TOP_W_PORTRATE")
                 .resizable()
                 .scaledToFit()
             VStack {
+                Spacer().frame(height: 60)
+                BatteryIndicator(vehicleStore: vehicleStore)
+                Spacer().frame(height: 50)
                 BootStatus(vehicleStore: vehicleStore)
                 Spacer().frame(height: 12.0)
                 LockStatus(vehicleStore: vehicleStore)
@@ -27,6 +30,60 @@ struct VehicleView: View {
         .onDisappear {
             vehicleStore.stopRefreshTask()
         }
+    }
+}
+
+struct BatteryIndicator: View {
+    @StateObject var vehicleStore : VehicleStore
+
+    var body: some View {
+        ZStack(alignment: .top) {
+            Circle()
+                .trim(from: 0.0, to: 0.5)
+                .stroke(Color.gray, style: StrokeStyle(lineWidth: 12.0, dash: [8]))
+                .frame(width: 180, height: 200)
+                .rotationEffect(Angle(degrees: -180))
+            if let fill = vehicleStore.batteryFillLevel {
+                Circle()
+                    .trim(from: 0.0, to: fill/2)
+                    .stroke(fillColor(), lineWidth: 12.0)
+                    .frame(width: 180, height: 200)
+                    .rotationEffect(Angle(degrees: -180))
+            }
+            // TODO use chargestations API to get charge target
+            VStack() {
+                Spacer().frame(height:20)
+                if let fill = vehicleStore.batteryFillLevel {
+                    Text("\(Int(fill*100))%")
+                        .font(.custom("HelveticaNeue", size: 20.0))
+                        .foregroundColor(.black)
+                }
+                Spacer().frame(height:10)
+                if let gom = vehicleStore.kmToEmpty {
+                    let miles = Measurement(value: gom, unit: UnitLength.kilometers).converted(to: UnitLength.miles)
+                    Text("\(Int(miles.value)) \(miles.unit.symbol)")
+                        .foregroundColor(.black)
+                }
+            }
+        }
+    }
+    
+    fileprivate func fillColor() -> Color {
+        if let bat = vehicleStore.batteryFillLevel {
+            if bat < 0.10 {
+                return Color.red
+            }
+            else if bat < 0.30 {
+                return Color.yellow
+            }
+            else if bat < 0.50 {
+                return Color.blue
+            }
+            else {
+                return Color("Green")
+            }
+        }
+        return Color.gray
     }
 }
 
@@ -147,7 +204,9 @@ struct BootStatus: View {
 
 struct VehicleView_Previews: PreviewProvider {
     static var previews: some View {
-        VehicleView(vehicleStore: VehicleStore(true))
-.previewInterfaceOrientation(.portrait)
+        Group {
+            VehicleView(vehicleStore: VehicleStore(true))
+                .previewInterfaceOrientation(.portrait)
+        }
     }
 }

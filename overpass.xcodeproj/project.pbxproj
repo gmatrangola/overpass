@@ -10,6 +10,7 @@
 		6C6736E02795371E008818FF /* FordModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C6736DF2795371E008818FF /* FordModel.swift */; };
 		6C82988827A591C200C8773F /* VehicleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C82988727A591C200C8773F /* VehicleViewModel.swift */; };
 		6C82988A27A6352600C8773F /* PollStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C82988927A6352600C8773F /* PollStatus.swift */; };
+		6C82988C27AA173100C8773F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 6C82988B27AA173100C8773F /* README.md */; };
 		6CAA2317278D10AA00FF172E /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6CAA2316278D10AA00FF172E /* KeychainSwift */; };
 		6CB25C0727838EED0086DEF0 /* overpassApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C0627838EED0086DEF0 /* overpassApp.swift */; };
 		6CB25C0927838EED0086DEF0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C0827838EED0086DEF0 /* ContentView.swift */; };
@@ -53,6 +54,7 @@
 		6C6736DF2795371E008818FF /* FordModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FordModel.swift; sourceTree = "<group>"; };
 		6C82988727A591C200C8773F /* VehicleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleViewModel.swift; sourceTree = "<group>"; };
 		6C82988927A6352600C8773F /* PollStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollStatus.swift; sourceTree = "<group>"; };
+		6C82988B27AA173100C8773F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		6CB25C0327838EED0086DEF0 /* overpass.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = overpass.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CB25C0627838EED0086DEF0 /* overpassApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = overpassApp.swift; sourceTree = "<group>"; };
 		6CB25C0827838EED0086DEF0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 		6CB25BFA27838EED0086DEF0 = {
 			isa = PBXGroup;
 			children = (
+				6C82988B27AA173100C8773F /* README.md */,
 				6CB25C0527838EED0086DEF0 /* overpass */,
 				6CB25C1B27838EEF0086DEF0 /* overpassTests */,
 				6CB25C2527838EEF0086DEF0 /* overpassUITests */,
@@ -308,6 +311,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C82988C27AA173100C8773F /* README.md in Resources */,
 				6CB25C0E27838EEF0086DEF0 /* Preview Assets.xcassets in Resources */,
 				6CB25C0B27838EEF0086DEF0 /* Assets.xcassets in Resources */,
 			);

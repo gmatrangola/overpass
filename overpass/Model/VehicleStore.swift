@@ -17,6 +17,8 @@ class VehicleStore : ObservableObject {
     @Published var vehicleInfo: VehicleInfo?
     @Published var lockState: LockState = .unknown
     @Published var remoteStartState: RemoteStartState = .unknown
+    @Published var batteryFillLevel: Double? // percentage
+    @Published var kmToEmpty: Double? // GOM
     
     private var refreshTask: Task<Void, Never>?
     private var commandPollTask: Task<Void, Never>?
@@ -37,6 +39,8 @@ class VehicleStore : ObservableObject {
             lockState = .locked
             remoteStartState = .off
             currentState = CurrentState.savedStatus(Date())
+            batteryFillLevel = 0.544
+            kmToEmpty = 155
         }
     }
     
@@ -118,10 +122,14 @@ class VehicleStore : ObservableObject {
             default: lockState = .unknown
         }
         switch (vehicleStatus?.remoteStartStatus?.value) {
-        case 1: remoteStartState = .started(vehicleStatus?.remoteStart?.remoteStartTime)
-        case 0: remoteStartState = .off
-        default: remoteStartState = .off
+            case 1: remoteStartState = .started(vehicleStatus?.remoteStart?.remoteStartTime)
+            case 0: remoteStartState = .off
+            default: remoteStartState = .off
         }
+        if let level = vehicleStatus?.batteryFillLevel?.value {
+            batteryFillLevel = level / 100.0 // because it's a %
+        }
+        kmToEmpty = vehicleStatus?.elVehDTE?.value
     }
 
     func toggleLock() {
