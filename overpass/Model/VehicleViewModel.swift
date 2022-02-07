@@ -38,6 +38,21 @@ enum RemoteStartState {
     case startError(_ message: String)
 }
 
+enum PlugState {
+    case unknown
+    case pluggedIn
+    case unplugged
+}
+
+enum ChargeState {
+    case unknown
+    case chargeScheduled
+    case chargeTargetReached
+    case forceCharge
+    case acCharge
+    case level3Charging
+}
+
 enum StateError: Error {
     case unknownLockState(_ description: String)
     case lockError(_ message: String)

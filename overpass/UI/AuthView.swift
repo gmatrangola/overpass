@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AuthView: View {
-    @StateObject var vehicleStore: VehicleStore
+    @StateObject var vehicleStore: VehicleService
     @StateObject private var authViewModel = AuthViewModel()
     var body: some View {
         VStack {
@@ -48,6 +48,6 @@ struct AuthView: View {
 
 struct AuthView_Previews: PreviewProvider {
     static var previews: some View {
-        AuthView(vehicleStore: VehicleStore())
+        AuthView(vehicleStore: VehicleService())
     }
 }

@@ -8,21 +8,30 @@
 import SwiftUI
 
 struct VehicleView: View {
-    @StateObject var vehicleStore : VehicleStore
+    @StateObject var vehicleStore : VehicleService
     var body: some View {
         ZStack(alignment: .top) {
             Image("Ford_Mustang_Mach-E_4_2020_TOP_W_PORTRATE")
                 .resizable()
                 .scaledToFit()
-            VStack {
+                .frame(alignment: .topLeading)
+            VStack(alignment: .subCentre ) {
                 Spacer().frame(height: 60)
-                BatteryIndicator(vehicleStore: vehicleStore)
-                Spacer().frame(height: 50)
+                HStack {
+                    PlugStatusView(vehicleStore: vehicleStore)
+                    Spacer().frame(width: 15.0)
+                    BatteryIndicator(vehicleStore: vehicleStore)
+                        .alignmentGuide(.subCentre) { d in d.width/2 }
+                }
+                Spacer().frame(height: 80)
                 BootStatus(vehicleStore: vehicleStore)
                 Spacer().frame(height: 12.0)
                 LockStatus(vehicleStore: vehicleStore)
+                GeometryReader { geometry in EmptyView() }
             }
+            .alignmentGuide(.subCentre) { d in d.width/2}
         }
+        .frame(maxWidth: .infinity)
         
         .onAppear {
             vehicleStore.startRefreshTask()
@@ -33,8 +42,46 @@ struct VehicleView: View {
     }
 }
 
+//Custom Alignment Guide
+extension HorizontalAlignment {
+    enum SubCenter: AlignmentID {
+        static func defaultValue(in d: ViewDimensions) -> CGFloat {
+            d[HorizontalAlignment.center]
+        }
+    }
+
+    static let subCentre = HorizontalAlignment(SubCenter.self)
+}
+
+struct PlugStatusView: View {
+    @StateObject var vehicleStore : VehicleService
+
+    var body: some View {
+        if vehicleStore.plugState == .pluggedIn {
+            HStack(spacing: 1.0) {
+                switch vehicleStore.chargeState {
+                case .chargeScheduled:
+                    Image(systemName: "bolt.badge.a").foregroundColor(Color.gray)
+                case .chargeTargetReached:
+                    Spacer()
+                case .forceCharge:
+                    Image(systemName: "bolt.circle").foregroundColor(Color.yellow)
+                case .acCharge:
+                    Image(systemName: "bolt").foregroundColor(Color.yellow)
+                case .level3Charging:
+                    Image(systemName: "bolt.fill").foregroundColor(Color.yellow)
+                default:
+                    Image(systemName: "bolt").foregroundColor(Color.gray)
+                }
+                Image(systemName: "powerplug")
+                    .foregroundColor(Color.black)
+            }
+        }
+    }
+}
+
 struct BatteryIndicator: View {
-    @StateObject var vehicleStore : VehicleStore
+    @StateObject var vehicleStore : VehicleService
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -53,8 +100,8 @@ struct BatteryIndicator: View {
             // TODO use chargestations API to get charge target
             VStack() {
                 Spacer().frame(height:20)
-                if let fill = vehicleStore.batteryFillLevel {
-                    Text("\(Int(fill*100))%")
+                if let batteryLevel = vehicleStore.batteryFillLevel {
+                    Text("\(Int(batteryLevel*100))%")
                         .font(.custom("HelveticaNeue", size: 20.0))
                         .foregroundColor(.black)
                 }
@@ -88,11 +135,11 @@ struct BatteryIndicator: View {
 }
 
 struct LockStatus: View {
-    @StateObject var vehicleStore : VehicleStore
+    @StateObject var vehicleStore : VehicleService
     var body: some View {
         if vehicleStore.vehicleStatus != nil {
             Button(action: toggleLock) {
-                Text(lockStatus()).foregroundColor(lockColor())
+                Label(lockStatus(), systemImage: "lock").foregroundColor(lockColor())
             }
             .disabled(lockDisableStatus())
         }
@@ -103,22 +150,14 @@ struct LockStatus: View {
     }
     
     fileprivate func lockStatus() -> String {
-        var status = "Unknown"
         switch (vehicleStore.lockState) {
-        case .unlocked:
-            status = "Unlocked"
-        case .locked:
-            status = "Locked"
-        case .unlocking:
-            status = "Unlocking"
-        case .locking:
-            status = "Locking"
-        case .lockError:
-            status = "Lock Error"
-        case .unknown:
-            status = "Unknown"
+        case .unlocked: return "Unlocked"
+        case .locked: return "Locked"
+        case .unlocking: return "Unlocking"
+        case .locking: return "Locking"
+        case .lockError: return "Lock Error"
+        case .unknown: return "Unknown"
         }
-        return status
     }
     
     fileprivate func lockDisableStatus() -> Bool {
@@ -133,26 +172,30 @@ struct LockStatus: View {
     }
     
     fileprivate func lockColor() -> Color {
-        var status = Color.blue
-        if let lock = vehicleStore.vehicleStatus?.lockStatus?.value {
-            if lock == "LOCKED" {
-                status = Color.white
-            }
-            else {
-                status = Color.orange
-            }
+        var status: Color
+        switch (vehicleStore.lockState) {
+        case .locked:
+            status = Color.white
+        case .unknown: fallthrough
+        case .locking: fallthrough
+        case .unlocking: fallthrough
+        case .unlocked:
+            status = Color.orange
+        default:
+            status = Color.blue
         }
+
         return status
     }
 
 }
 
 struct BootStatus: View {
-    @StateObject var vehicleStore : VehicleStore
+    @StateObject var vehicleStore : VehicleService
     var body: some View {
         if vehicleStore.vehicleStatus != nil {
             Button(action: initiateRemoteStart) {
-                Text(bootStatus()).foregroundColor(bootColor())
+                Label(bootText(), systemImage: bootImage()).foregroundColor(bootColor())
             }
             .disabled(startDisabledStatus())
         }
@@ -162,16 +205,24 @@ struct BootStatus: View {
         vehicleStore.initiateRemoteStart()
     }
     
-    fileprivate func bootStatus() -> String {
-        var status = "Unknown"
+    fileprivate func bootText() -> String {
         switch vehicleStore.remoteStartState {
-        case .starting: status = "Starting"
-        case .started: status = "Started"
-        case .running: status = "Running"
-        case .off: status = "Off"
-        default: status = "Unknown"
+        case .starting: return "Starting"
+        case .started: return "Started"
+        case .running: return "Running"
+        case .off: return "Off"
+        default: return "Unknown"
         }
-        return status
+    }
+    
+    fileprivate func bootImage() -> String {
+        switch vehicleStore.remoteStartState {
+        case .starting: return "power.dotted"
+        case .started: return "power.circle.fill"
+        case .running: return "goforward"
+        case .off: return "power"
+        default: return "xmark.octagon.fill"
+        }
     }
     
     fileprivate func startDisabledStatus() -> Bool {
@@ -182,31 +233,20 @@ struct BootStatus: View {
     }
     
     fileprivate func bootColor() -> Color {
-        var status = Color.white
-        if let ignition = vehicleStore.vehicleStatus?.ignitionStatus?.value {
-            switch ignition {
-            case "Run": status = Color.green
-            case "Off": status = Color.gray
-            default:
-                status = Color.white
-            }
+        switch vehicleStore.remoteStartState {
+        case .starting: return Color.yellow
+        case .started: return Color.yellow
+        case .running: return Color.white
+        case .off: return Color.gray
+        default: return Color.blue
         }
-        if let remote = vehicleStore.vehicleStatus?.remoteStartStatus?.value {
-            if (remote == 1) {
-                status = Color.blue
-            }
-        }
-        return status
     }
-
 }
 
 
 struct VehicleView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            VehicleView(vehicleStore: VehicleStore(true))
-                .previewInterfaceOrientation(.portrait)
-        }
+        VehicleView(vehicleStore: VehicleService(true))
+        
     }
 }

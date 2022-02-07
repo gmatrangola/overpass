@@ -10,7 +10,7 @@ import CoreData
 
 struct ContentView: View {
     @State private var currentTab = "vehicle"
-    @StateObject private var vehicleStore = VehicleStore()
+    @StateObject private var vehicleStore = VehicleService()
 
     fileprivate func handleMainAppears() {
         if vehicleStore.vins.isEmpty {
