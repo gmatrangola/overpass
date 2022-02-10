@@ -30,6 +30,12 @@ class VehicleApi : RestApi {
         return message
     }
     
+    func getPlugStatus(vin: String) async throws -> PlugStatus {
+        let data = try await makeFordRequest(string: "https://api.mps.ford.com/api/vpoi/chargestations/v3/plugstatus")
+        print ("PlugStatus = \(String(data: data, encoding:.utf8)!)")
+        return try jsonDecoder().decode(PlugStatus.self, from: data)
+    }
+    
     func getVehicleInfo(vin: String) async throws -> VehicleInfo {
         let data = try await makeFordRequest(string: "https://usapi.cv.ford.com/api/users/vehicles/\(vin)/detail?lrdt=01-01-1970%2000:00:00")
         print ("VehicleInfo = \(String(data: data, encoding:.utf8)!)")

@@ -14,6 +14,7 @@ class VehicleService : ObservableObject {
     @Published var vins: [String] = []
     @Published var currentVin: String?
     @Published var vehicleStatus: VehicleStatus?
+    @Published var plugStatus: PlugStatus?
     @Published var vehicleInfo: VehicleInfo?
     @Published var lockState: LockState = .unknown
     @Published var remoteStartState: RemoteStartState = .unknown
@@ -21,6 +22,9 @@ class VehicleService : ObservableObject {
     @Published var plugState: PlugState = .unknown
     @Published var batteryFillLevel: Double? // percentage
     @Published var kmToEmpty: Double? // GOM
+    @Published var chargeStarted: Date?
+    @Published var chargeEndTime: Date?
+    @Published var chargeTaret: Double?
     
     private var refreshTask: Task<Void, Never>?
     private var commandPollTask: Task<Void, Never>?
@@ -45,6 +49,7 @@ class VehicleService : ObservableObject {
             kmToEmpty = 155
             plugState = .pluggedIn
             chargeState = .chargeScheduled
+            chargeTaret = 0.90
         }
     }
     
@@ -78,6 +83,15 @@ class VehicleService : ObservableObject {
                 let date = vehicleStatus?.lastRefresh ?? Date()
                 currentState = .savedStatus(date) // TODO Store date received
                 vehicleStatusUpdated(vstatus)
+                if vstatus.plugStatus?.value != 0 {
+                    plugStatus = try await VehicleApi.shared.getPlugStatus(vin: vin)
+                    if let target = plugStatus?.chargeTargetLevel {
+                        chargeTaret = target
+                    }
+                    else {
+                        chargeTaret = nil
+                    }
+                }
             }
             
             // TODO do this less often
@@ -122,6 +136,8 @@ class VehicleService : ObservableObject {
     }
     
     fileprivate func vehicleStatusUpdated(_ vstatus: VehicleStatus) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM-dd-yyyy HH:mm:ss"
         switch (vstatus.lockStatus?.value) {
             case "LOCKED" : lockState = .locked
             case "UNLOCKED" : lockState = .unlocked
@@ -148,9 +164,16 @@ class VehicleService : ObservableObject {
             switch(chargingStatus) {
             case "ChargeScheduled": chargeState = .chargeScheduled
             case "ChargeTargetReached": chargeState = .chargeTargetReached
+            case "ChargingAC": chargeState = .acCharge
             case "ChargingDCFastCharge": chargeState = .level3Charging
             case "ChargeStartCommanded": chargeState = .forceCharge
             default: chargeState = .unknown
+            }
+            if let start = vstatus.chargeStartTime?.value {
+                chargeStarted = dateFormatter.date(from:start)
+            }
+            if let end = vstatus.chargeEndTime?.value {
+                chargeEndTime = dateFormatter.date(from:end)
             }
         }
     }

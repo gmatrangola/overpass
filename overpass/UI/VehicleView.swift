@@ -90,6 +90,18 @@ struct BatteryIndicator: View {
                 .stroke(Color.gray, style: StrokeStyle(lineWidth: 12.0, dash: [8]))
                 .frame(width: 180, height: 200)
                 .rotationEffect(Angle(degrees: -180))
+            if let target = vehicleStore.chargeTaret {
+                Circle()
+                    .trim(from: 0.0, to: target/2)
+                    .stroke(Color.black, lineWidth: 15.0)
+                    .frame(width: 180, height: 200)
+                    .rotationEffect(Angle(degrees: -180))
+                Circle()
+                    .trim(from: 0.0, to: target/2 - 0.004)
+                    .stroke(Color.gray, lineWidth: 12.0)
+                    .frame(width: 180, height: 200)
+                    .rotationEffect(Angle(degrees: -180))
+            }
             if let fill = vehicleStore.batteryFillLevel {
                 Circle()
                     .trim(from: 0.0, to: fill/2)

@@ -145,6 +145,36 @@ struct VehicleStatusMessage: Codable {
     var version: String?
 }
 
+struct Address: Codable {
+    // {"streetAddress":"","city":"","state":"MD","province":null,"country":"USA","zipCode":"21122"}
+    var streetAddress: String?
+    var city: String?
+    var state: String?
+    var province: String?
+    var country: String?
+    var zipCode: String?
+}
+
+struct PlugStatus: Codable {
+    // "{"vin":"","status":200,"maxRangePossible":287.0,"plugInTime":"2022-02-08T01:49:47Z","initialDte":28.0,"energy":12436.534,"power":6335.0,"chargeLocationName":"Default","estimatedChargeEndTime":"2022-02-08T03:02","chargeTargetLevel":95.0,"chargeType":"AcBasic","network":null,"gsscInitiatedBy":"Vehicle","chargeLocationAddress":{"streetAddress":"","city":"","state":"MD","province":null,"country":"USA","zipCode":"21122"},"locationType":"SAVED"}",
+
+    var vin: String?
+    var status: Int
+    var maxPossibleRange: Double?
+    var plugInTime: Date?
+    var initialDte: Double?
+    var energy: Double?
+    var power: Double?
+    var chargeLocationName: String?
+    var estimatedChargeEndTime: Date?
+    var chargeTargetLevel: Double?
+    var chargeType: String?
+    var network: String?
+    var gsscInitiatedBy: String?
+    var chargeLocationAddress: Address?
+    var locationType: String?
+}
+
 struct DcFastChargeData: Codable {
     var fstChrgBulkTEst: Status?
     var fstChrgCmpltTEst: Status?
