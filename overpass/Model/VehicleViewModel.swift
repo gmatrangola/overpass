@@ -51,6 +51,7 @@ enum ChargeState {
     case forceCharge
     case acCharge
     case level3Charging
+    case notReady
 }
 
 enum StateError: Error {

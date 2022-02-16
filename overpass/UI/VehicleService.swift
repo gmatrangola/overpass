@@ -11,8 +11,10 @@ import SwiftUI
 @MainActor
 class VehicleService : ObservableObject {
     @Published var currentState: CurrentState?
+    @Published var networkActivity = false
     @Published var vins: [String] = []
     @Published var currentVin: String?
+    @Published var nickName: String?
     @Published var vehicleStatus: VehicleStatus?
     @Published var plugStatus: PlugStatus?
     @Published var vehicleInfo: VehicleInfo?
@@ -38,6 +40,7 @@ class VehicleService : ObservableObject {
         else {
             vins = ["123123123"]
             currentVin = "123123123"
+            nickName = "Test"
             vehicleStatus = VehicleStatus()
             vehicleStatus?.lockStatus = Status(value: "LOCKED")
             vehicleStatus?.remoteStartStatus = IntStatus(value: 0)
@@ -96,6 +99,10 @@ class VehicleService : ObservableObject {
             
             // TODO do this less often
             vehicleInfo = try await VehicleApi.shared.getVehicleInfo(vin: vin)
+            nickName = vehicleInfo?.vehicle?.nickName
+            if nickName == nil {
+                nickName = vehicleInfo?.vehicle?.vehicleType
+            }
             defaults.set(try jsonEncoder.encode(vehicleInfo), forKey: "info-" + vin)
         }
         catch {
@@ -152,14 +159,6 @@ class VehicleService : ObservableObject {
             batteryFillLevel = level / 100.0 // because it's a %
         }
         kmToEmpty = vstatus.elVehDTE?.value
-        if let pstat = vstatus.plugStatus?.value {
-            if pstat == 1 {
-                plugState = .pluggedIn
-            }
-            else {
-                plugState = .unplugged
-            }
-        }
         if let chargingStatus = vstatus.chargingStatus?.value {
             switch(chargingStatus) {
             case "ChargeScheduled": chargeState = .chargeScheduled
@@ -167,6 +166,7 @@ class VehicleService : ObservableObject {
             case "ChargingAC": chargeState = .acCharge
             case "ChargingDCFastCharge": chargeState = .level3Charging
             case "ChargeStartCommanded": chargeState = .forceCharge
+            case "NotReady": chargeState = .notReady
             default: chargeState = .unknown
             }
             if let start = vstatus.chargeStartTime?.value {
@@ -176,17 +176,32 @@ class VehicleService : ObservableObject {
                 chargeEndTime = dateFormatter.date(from:end)
             }
         }
+        if let pstat = vstatus.plugStatus?.value {
+            if pstat == 1 {
+                plugState = .pluggedIn
+            }
+            else {
+                if chargeState == .notReady {
+                    plugState = .pluggedIn
+                }
+                else {
+                    plugState = .unplugged
+                }
+            }
+        }
     }
 
     func toggleLock() {
         Task {
             if let vin = currentVin {
+                networkActivity = true
                 do {
                     try await troggleLock(vin)
                 }
                 catch {
                     print("toggleLock Error \(error)")
                     currentState = CurrentState.unkownError(error.localizedDescription)
+                    networkActivity = true
                 }
             }
         }
@@ -208,6 +223,7 @@ class VehicleService : ObservableObject {
                     else {
                         self.lockState = .lockError("Failed")
                     }
+                    self.networkActivity = false
                 }
             }
             else {
@@ -227,6 +243,7 @@ class VehicleService : ObservableObject {
                     else {
                         self.lockState = .lockError("Failed")
                     }
+                    self.networkActivity = false
                 }
             }
             else {
@@ -242,8 +259,14 @@ class VehicleService : ObservableObject {
     func initiateRemoteStart() {
         Task {
             if let vin = currentVin {
+                networkActivity = true
                 do {
                     try await remoteStart(vin)
+                }
+                catch {
+                    print("RemoteStart \(error)")
+                    currentState = CurrentState.unkownError(error.localizedDescription)
+                    networkActivity = true
                 }
             }
         }
@@ -265,6 +288,7 @@ class VehicleService : ObservableObject {
                     else {
                         self.remoteStartState = .startFailed
                     }
+                    self.networkActivity = false
                 }
             }
             else {
@@ -283,6 +307,7 @@ class VehicleService : ObservableObject {
                     else {
                         self.remoteStartState = .startFailed
                     }
+                    self.networkActivity = false
                 }
             }
             else {
@@ -368,7 +393,9 @@ class VehicleService : ObservableObject {
         if let vin = currentVin {
             readVehicleData(vin)
             Task {
+                networkActivity = true
                 await updateVehicleData(vin)
+                networkActivity = false
             }
         }
     }

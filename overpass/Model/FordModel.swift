@@ -159,7 +159,7 @@ struct PlugStatus: Codable {
     // "{"vin":"","status":200,"maxRangePossible":287.0,"plugInTime":"2022-02-08T01:49:47Z","initialDte":28.0,"energy":12436.534,"power":6335.0,"chargeLocationName":"Default","estimatedChargeEndTime":"2022-02-08T03:02","chargeTargetLevel":95.0,"chargeType":"AcBasic","network":null,"gsscInitiatedBy":"Vehicle","chargeLocationAddress":{"streetAddress":"","city":"","state":"MD","province":null,"country":"USA","zipCode":"21122"},"locationType":"SAVED"}",
 
     var vin: String?
-    var status: Int
+    var status: Int?
     var maxPossibleRange: Double?
     var plugInTime: Date?
     var initialDte: Double?

@@ -62,8 +62,10 @@ struct PlugStatusView: View {
                 switch vehicleStore.chargeState {
                 case .chargeScheduled:
                     Image(systemName: "bolt.badge.a").foregroundColor(Color.gray)
+                case .notReady:
+                    Image(systemName: "bolt.heart").foregroundColor(Color.gray)
                 case .chargeTargetReached:
-                    Spacer()
+                    Image(systemName: "bolt.heart").foregroundColor(Color.gray)
                 case .forceCharge:
                     Image(systemName: "bolt.circle").foregroundColor(Color.yellow)
                 case .acCharge:
@@ -151,7 +153,7 @@ struct LockStatus: View {
     var body: some View {
         if vehicleStore.vehicleStatus != nil {
             Button(action: toggleLock) {
-                Label(lockStatus(), systemImage: "lock").foregroundColor(lockColor())
+                Label(lockStatus(), systemImage: lockImage()).foregroundColor(lockColor())
             }
             .disabled(lockDisableStatus())
         }
@@ -171,6 +173,18 @@ struct LockStatus: View {
         case .unknown: return "Unknown"
         }
     }
+    
+    fileprivate func lockImage() -> String {
+        switch (vehicleStore.lockState) {
+        case .unlocked: return "lock.open"
+        case .locked: return "lock"
+        case .unlocking: return "lock.rotation.open"
+        case .locking: return "lock.rotation.open"
+        case .lockError: return "lock.slash"
+        case .unknown: return "lock.slash"
+        }
+    }
+
     
     fileprivate func lockDisableStatus() -> Bool {
         switch (vehicleStore.lockState) {

@@ -21,11 +21,11 @@ class RestApi {
         return decoder
     }
     
-    func makeFordRequest(string: String, method: String = "GET", body: String? = nil, retries: Int = 4) async throws -> Data{
-        return try await makeFordRequest(url: URL(string: string)!, method: method, body: body, retries: retries)
+    func makeFordRequest(string: String, method: String = "GET", body: String? = nil, retries: Int = 4, vin: String? = nil) async throws -> Data{
+        return try await makeFordRequest(url: URL(string: string)!, method: method, body: body, retries: retries, vin: vin)
     }
     
-    func makeFordRequest(url: URL, method: String = "GET", body: String? = nil, retries: Int = 4) async throws -> Data {
+    func makeFordRequest(url: URL, method: String = "GET", body: String? = nil, retries: Int = 4, vin: String? = nil) async throws -> Data {
         let authToken = try await auth.validToken()
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -35,6 +35,9 @@ class RestApi {
         request.setValue("FordPass/2 CFNetwork/1312 Darwin/21.0.0", forHTTPHeaderField: "User-Agent")
         request.setValue("gzip, deflate, br", forHTTPHeaderField: "Accept-Encoding")
         request.setValue(authToken, forHTTPHeaderField: "auth-token")
+        if let v = vin {
+            request.setValue(v, forHTTPHeaderField: "vin")
+        }
         request.httpMethod = method
     
         if (body != nil) {

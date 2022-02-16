@@ -9,42 +9,44 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    @State private var currentTab = "vehicle"
-    @StateObject private var vehicleStore = VehicleService()
+    @StateObject var vehicleService = VehicleService()
 
     fileprivate func handleMainAppears() {
-        if vehicleStore.vins.isEmpty {
-            currentTab = "account"
+        if vehicleService.vins.isEmpty {
         }
     }
     
     var body: some View {
-        TabView (selection: $currentTab){
-
-            VehicleView(vehicleStore: vehicleStore)
-                .tabItem {
-                    Image(systemName: "car")
-                    Text("Vehicle")
+        NavigationView {
+            VStack {
+                HStack {
+                    NavigationLink(destination: AuthView(vehicleStore: vehicleService)) {
+                        Image(systemName: "gearshape")
+                            .padding()
+                    }
+                    Spacer()
+                    if let name = vehicleService.nickName {
+                        Text(name)
+                        Spacer()
+                    }
+                    if vehicleService.networkActivity {
+                        ProgressView()
+                            .padding()
+                    }
                 }
-                .tag("vehicle")
-                .onAppear {
-                    handleMainAppears()
-                }
-            AuthView(vehicleStore: vehicleStore)
-                .tabItem {
-                    Image(systemName: "gear")
-                    Text("Account")
-                }
-                .tag("account")
+                Spacer()
+                VehicleView(vehicleStore: vehicleService)
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitle("")
+            .navigationBarHidden(true)
         }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            ContentView().previewInterfaceOrientation(.portrait)
+        ContentView(vehicleService: VehicleService(true)).previewInterfaceOrientation(.portrait)
         
-        }
     }
 }

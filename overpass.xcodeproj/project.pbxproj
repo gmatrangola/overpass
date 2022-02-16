@@ -181,8 +181,8 @@
 			children = (
 				6CB25C3D2783AEBA0086DEF0 /* AuthView.swift */,
 				6CB25C3F2783B00C0086DEF0 /* AuthViewModel.swift */,
-				6CB25C3727839CC00086DEF0 /* VehicleView.swift */,
 				6CB25C0827838EED0086DEF0 /* ContentView.swift */,
+				6CB25C3727839CC00086DEF0 /* VehicleView.swift */,
 				6C82988927A6352600C8773F /* PollStatus.swift */,
 				6CCFF61F279FA29000582514 /* VehicleService.swift */,
 			);

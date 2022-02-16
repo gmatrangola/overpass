@@ -10,6 +10,7 @@ import SwiftUI
 struct AuthView: View {
     @StateObject var vehicleStore: VehicleService
     @StateObject private var authViewModel = AuthViewModel()
+    @Environment(\.presentationMode) var presentationMode
     var body: some View {
         VStack {
             Text("Ford Pass Login")
@@ -29,6 +30,7 @@ struct AuthView: View {
                     if success {
                         vehicleStore.addVin(vin: authViewModel.vin)
                         vehicleStore.currentVin = authViewModel.vin
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }
             }
