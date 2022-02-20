@@ -12,6 +12,8 @@
 		6C82988A27A6352600C8773F /* PollStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C82988927A6352600C8773F /* PollStatus.swift */; };
 		6C82988C27AA173100C8773F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 6C82988B27AA173100C8773F /* README.md */; };
 		6CAA2317278D10AA00FF172E /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6CAA2316278D10AA00FF172E /* KeychainSwift */; };
+		6CB0800A27C1BD2A004C3A32 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB0800927C1BD2A004C3A32 /* Theme.swift */; };
+		6CB0800C27C1C4EF004C3A32 /* ChargeStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB0800B27C1C4EF004C3A32 /* ChargeStatusView.swift */; };
 		6CB25C0727838EED0086DEF0 /* overpassApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C0627838EED0086DEF0 /* overpassApp.swift */; };
 		6CB25C0927838EED0086DEF0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB25C0827838EED0086DEF0 /* ContentView.swift */; };
 		6CB25C0B27838EEF0086DEF0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6CB25C0A27838EEF0086DEF0 /* Assets.xcassets */; };
@@ -55,6 +57,8 @@
 		6C82988727A591C200C8773F /* VehicleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleViewModel.swift; sourceTree = "<group>"; };
 		6C82988927A6352600C8773F /* PollStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollStatus.swift; sourceTree = "<group>"; };
 		6C82988B27AA173100C8773F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		6CB0800927C1BD2A004C3A32 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		6CB0800B27C1C4EF004C3A32 /* ChargeStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChargeStatusView.swift; sourceTree = "<group>"; };
 		6CB25C0327838EED0086DEF0 /* overpass.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = overpass.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CB25C0627838EED0086DEF0 /* overpassApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = overpassApp.swift; sourceTree = "<group>"; };
 		6CB25C0827838EED0086DEF0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -185,6 +189,8 @@
 				6CB25C3727839CC00086DEF0 /* VehicleView.swift */,
 				6C82988927A6352600C8773F /* PollStatus.swift */,
 				6CCFF61F279FA29000582514 /* VehicleService.swift */,
+				6CB0800927C1BD2A004C3A32 /* Theme.swift */,
+				6CB0800B27C1C4EF004C3A32 /* ChargeStatusView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -345,8 +351,10 @@
 				6CB25C1327838EEF0086DEF0 /* overpass.xcdatamodeld in Sources */,
 				6CE2E2B62799A68200AA0ABE /* AuthApi.swift in Sources */,
 				6CB25C422783B2100086DEF0 /* Authentication.swift in Sources */,
+				6CB0800C27C1C4EF004C3A32 /* ChargeStatusView.swift in Sources */,
 				6CB25C0927838EED0086DEF0 /* ContentView.swift in Sources */,
 				6CB25C3827839CC00086DEF0 /* VehicleView.swift in Sources */,
+				6CB0800A27C1BD2A004C3A32 /* Theme.swift in Sources */,
 				6CB25C3E2783AEBA0086DEF0 /* AuthView.swift in Sources */,
 				6CE2E2B82799A82200AA0ABE /* Zones.swift in Sources */,
 				6CE2E2BC2799A94300AA0ABE /* RestApi.swift in Sources */,

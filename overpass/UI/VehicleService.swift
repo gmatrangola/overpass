@@ -26,7 +26,7 @@ class VehicleService : ObservableObject {
     @Published var kmToEmpty: Double? // GOM
     @Published var chargeStarted: Date?
     @Published var chargeEndTime: Date?
-    @Published var chargeTaret: Double?
+    @Published var chargeTarget: Double?
     
     private var refreshTask: Task<Void, Never>?
     private var commandPollTask: Task<Void, Never>?
@@ -45,6 +45,8 @@ class VehicleService : ObservableObject {
             vehicleStatus?.lockStatus = Status(value: "LOCKED")
             vehicleStatus?.remoteStartStatus = IntStatus(value: 0)
             vehicleStatus?.ignitionStatus = Status(value: "Off")
+            vehicleStatus?.chargeStartTime = Status(value: "02-19-2022 13:43:00")
+            vehicleStatus?.chargeEndTime = Status(value: "02-19-2022 17:35:00")
             lockState = .locked
             remoteStartState = .off
             currentState = CurrentState.savedStatus(Date())
@@ -52,7 +54,7 @@ class VehicleService : ObservableObject {
             kmToEmpty = 155
             plugState = .pluggedIn
             chargeState = .chargeScheduled
-            chargeTaret = 0.90
+            chargeTarget = 0.90
         }
     }
     
@@ -88,11 +90,17 @@ class VehicleService : ObservableObject {
                 vehicleStatusUpdated(vstatus)
                 if vstatus.plugStatus?.value != 0 {
                     plugStatus = try await VehicleApi.shared.getPlugStatus(vin: vin)
+                    // not sure why it's different sometimes
                     if let target = plugStatus?.chargeTargetLevel {
-                        chargeTaret = target
+                        chargeTarget = target
                     }
                     else {
-                        chargeTaret = nil
+                        if let targetSoc = plugStatus?.curntTrgtSoc {
+                            chargeTarget = Double(targetSoc) / 100.0
+                        }
+                        else {
+                            chargeTarget = nil
+                        }
                     }
                 }
             }

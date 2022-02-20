@@ -155,6 +155,38 @@ struct Address: Codable {
     var zipCode: String?
 }
 
+struct ChargeWindow: Codable {
+    var startTime: String?
+    var endTime: String?
+}
+
+struct ChargeSchedule: Codable {
+    var chargeWindows: [ChargeWindow]
+    var days: String?
+    var desiredChargeLevel: Int?
+}
+
+struct UtilityProvider: Codable {
+    var country: String?
+    var id: String?
+    var planId: String?
+    var planName: String?
+    var sessionEndDate: String?
+    var sessionStartDate: String?
+    var zipCode: String?
+}
+
+struct CharegeProfile: Codable {
+    var chargeNow: Bool?
+    var chargeSchedules: [ChargeSchedule]
+    var utilityProvider: UtilityProvider?
+}
+
+struct Coordinates: Codable {
+    var lat: Double?
+    var lon: Double?
+}
+
 struct PlugStatus: Codable {
     // "{"vin":"","status":200,"maxRangePossible":287.0,"plugInTime":"2022-02-08T01:49:47Z","initialDte":28.0,"energy":12436.534,"power":6335.0,"chargeLocationName":"Default","estimatedChargeEndTime":"2022-02-08T03:02","chargeTargetLevel":95.0,"chargeType":"AcBasic","network":null,"gsscInitiatedBy":"Vehicle","chargeLocationAddress":{"streetAddress":"","city":"","state":"MD","province":null,"country":"USA","zipCode":"21122"},"locationType":"SAVED"}",
 
@@ -172,7 +204,16 @@ struct PlugStatus: Codable {
     var network: String?
     var gsscInitiatedBy: String?
     var chargeLocationAddress: Address?
+    var address: Address?
     var locationType: String?
+    var chargeProfile: CharegeProfile?
+    var curntTrgtSoc: Int?
+    var LocationId: String?
+    var LocationName: String?
+    var type: String?
+    var unSavedLocationId: Int?
+    var userId: String?
+    
 }
 
 struct DcFastChargeData: Codable {

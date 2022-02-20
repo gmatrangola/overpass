@@ -8,36 +8,39 @@
 import SwiftUI
 
 struct VehicleView: View {
-    @StateObject var vehicleStore : VehicleService
+    @StateObject var vehicleService : VehicleService
     var body: some View {
         ZStack(alignment: .top) {
             Image("Ford_Mustang_Mach-E_4_2020_TOP_W_PORTRATE")
                 .resizable()
                 .scaledToFit()
                 .frame(alignment: .topLeading)
-            VStack(alignment: .subCentre ) {
-                Spacer().frame(height: 60)
+            VStack(alignment: .subCentre) {
+                Spacer().frame(height: 30)
                 HStack {
-                    PlugStatusView(vehicleStore: vehicleStore)
-                    Spacer().frame(width: 15.0)
-                    BatteryIndicator(vehicleStore: vehicleStore)
-                        .alignmentGuide(.subCentre) { d in d.width/2 }
+                    if vehicleService.plugState == .pluggedIn {
+                        VStack {
+                            Spacer().frame(height:70)
+                            Image(systemName: "powerplug")
+                                .foregroundColor(Color.textColor)
+                        }
+                        Spacer().frame(width:20)
+                    }
+                    BatteryIndicator(vehicleService: vehicleService)
+                        .frame(width: 200, height: 200)
+                        .alignmentGuide(.subCentre) { d in d.width / 2}
                 }
-                Spacer().frame(height: 80)
-                BootStatus(vehicleStore: vehicleStore)
-                Spacer().frame(height: 12.0)
-                LockStatus(vehicleStore: vehicleStore)
                 GeometryReader { geometry in EmptyView() }
             }
             .alignmentGuide(.subCentre) { d in d.width/2}
-        }
-        .frame(maxWidth: .infinity)
-        
-        .onAppear {
-            vehicleStore.startRefreshTask()
-        }
-        .onDisappear {
-            vehicleStore.stopRefreshTask()
+            VStack {
+                Spacer().frame(height:30)
+                ChargeStatus(vehicleService: vehicleService)
+                Spacer().frame(height: 50)
+                BootStatus(vehicleStore: vehicleService)
+                Spacer().frame(height: 12.0)
+                LockStatus(vehicleStore: vehicleService)
+            }
         }
     }
 }
@@ -53,98 +56,129 @@ extension HorizontalAlignment {
     static let subCentre = HorizontalAlignment(SubCenter.self)
 }
 
-struct PlugStatusView: View {
-    @StateObject var vehicleStore : VehicleService
-
-    var body: some View {
-        if vehicleStore.plugState == .pluggedIn {
-            HStack(spacing: 1.0) {
-                switch vehicleStore.chargeState {
-                case .chargeScheduled:
-                    Image(systemName: "bolt.badge.a").foregroundColor(Color.gray)
-                case .notReady:
-                    Image(systemName: "bolt.heart").foregroundColor(Color.gray)
-                case .chargeTargetReached:
-                    Image(systemName: "bolt.heart").foregroundColor(Color.gray)
-                case .forceCharge:
-                    Image(systemName: "bolt.circle").foregroundColor(Color.yellow)
-                case .acCharge:
-                    Image(systemName: "bolt").foregroundColor(Color.yellow)
-                case .level3Charging:
-                    Image(systemName: "bolt.fill").foregroundColor(Color.yellow)
-                default:
-                    Image(systemName: "bolt").foregroundColor(Color.gray)
-                }
-                Image(systemName: "powerplug")
-                    .foregroundColor(Color.black)
-            }
-        }
-    }
-}
 
 struct BatteryIndicator: View {
-    @StateObject var vehicleStore : VehicleService
+    @StateObject var vehicleService : VehicleService
 
     var body: some View {
         ZStack(alignment: .top) {
             Circle()
                 .trim(from: 0.0, to: 0.5)
                 .stroke(Color.gray, style: StrokeStyle(lineWidth: 12.0, dash: [8]))
-                .frame(width: 180, height: 200)
+                
                 .rotationEffect(Angle(degrees: -180))
-            if let target = vehicleStore.chargeTaret {
+            if let target = vehicleService.chargeTarget {
                 Circle()
                     .trim(from: 0.0, to: target/2)
                     .stroke(Color.black, lineWidth: 15.0)
-                    .frame(width: 180, height: 200)
                     .rotationEffect(Angle(degrees: -180))
                 Circle()
                     .trim(from: 0.0, to: target/2 - 0.004)
                     .stroke(Color.gray, lineWidth: 12.0)
-                    .frame(width: 180, height: 200)
                     .rotationEffect(Angle(degrees: -180))
             }
-            if let fill = vehicleStore.batteryFillLevel {
+            if let fill = vehicleService.batteryFillLevel {
                 Circle()
                     .trim(from: 0.0, to: fill/2)
                     .stroke(fillColor(), lineWidth: 12.0)
-                    .frame(width: 180, height: 200)
                     .rotationEffect(Angle(degrees: -180))
-            }
-            // TODO use chargestations API to get charge target
-            VStack() {
-                Spacer().frame(height:20)
-                if let batteryLevel = vehicleStore.batteryFillLevel {
-                    Text("\(Int(batteryLevel*100))%")
-                        .font(.custom("HelveticaNeue", size: 20.0))
-                        .foregroundColor(.black)
-                }
-                Spacer().frame(height:10)
-                if let gom = vehicleStore.kmToEmpty {
-                    let miles = Measurement(value: gom, unit: UnitLength.kilometers).converted(to: UnitLength.miles)
-                    Text("\(Int(miles.value)) \(miles.unit.symbol)")
-                        .foregroundColor(.black)
-                }
             }
         }
     }
     
     fileprivate func fillColor() -> Color {
-        if let bat = vehicleStore.batteryFillLevel {
+        if let bat = vehicleService.batteryFillLevel {
             if bat < 0.10 {
-                return Color.red
+                return Color.errorColor
             }
             else if bat < 0.30 {
-                return Color.yellow
+                return Color.warningColor
             }
             else if bat < 0.50 {
-                return Color.blue
+                return Color.nominalColor
             }
             else {
-                return Color("Green")
+                return .goodColor
             }
         }
         return Color.gray
+    }
+}
+
+struct ChargeStatus: View {
+    @StateObject var vehicleService: VehicleService
+    var body: some View {
+        VStack() {
+            Spacer().frame(height:20)
+            if let batteryLevel = vehicleService.batteryFillLevel {
+                Text("\(Int(batteryLevel*100))%")
+                    .font(.custom("HelveticaNeue", size: 20.0))
+                    .foregroundColor(.black)
+            }
+            if let gom = vehicleService.kmToEmpty {
+                let miles = Measurement(value: gom, unit: UnitLength.kilometers).converted(to: UnitLength.miles)
+                Text("\(Int(miles.value)) \(miles.unit.symbol)")
+                    .foregroundColor(.black)
+            }
+            Spacer().frame(height:10)
+            if let started = vehicleService.vehicleStatus?.chargeStartTime?.value {
+                let begin = dateFormat(started)
+                if let end = vehicleService.vehicleStatus?.chargeEndTime?.value {
+                    let finish = dateFormat(end)
+                    Text(begin + "-" + finish)
+                        .allowsTightening(true)
+                        .frame(width:200)
+                        .lineLimit(3)
+                        .foregroundColor(Color.black)
+                }
+
+            }
+            if vehicleService.chargeState == .chargeScheduled || (vehicleService.chargeState == .chargeTargetReached && vehicleService.batteryFillLevel! < 0.999) {
+                Spacer().frame(height:80)
+                Button {
+                    
+                } label: {
+                    Label("Charge to 100%", systemImage: "bolt.circle")
+                }
+                
+            }
+            if vehicleService.chargeState == .acCharge || vehicleService.chargeState == .level3Charging {
+                Spacer().frame(maxHeight:20)
+                Button {
+                } label: {Label("Stop", systemImage: "bolt.slash").font(.caption)
+                }
+            }
+            if  vehicleService.chargeState == .forceCharge {
+                Spacer().frame(maxHeight:20)
+                Button {
+                    
+                } label: {Label ("Resume", systemImage: "bolt.badge.a").font(.caption)}
+            }
+        }
+
+    }
+    
+    func dateFormat(_ text: String) -> String {
+        
+        let toDate = DateFormatter()
+        toDate.dateFormat = "MM-dd-yyyy HH:mm:ss"
+        if let date = toDate.date(from: text) {
+            let dateOut = DateFormatter()
+            dateOut.timeStyle = .short
+            if Calendar.current.isDateInToday(date) {
+                dateOut.dateStyle = .none
+            }
+            else {
+                dateOut.dateStyle = .short
+            }
+            dateOut.doesRelativeDateFormatting = true
+            return dateOut.string(from: date)
+                .replacingOccurrences(of: " PM", with: "pm")
+                .replacingOccurrences(of: " AM", with: "am")
+        }
+        else {
+            return ""
+        }
     }
 }
 
@@ -272,7 +306,12 @@ struct BootStatus: View {
 
 struct VehicleView_Previews: PreviewProvider {
     static var previews: some View {
-        VehicleView(vehicleStore: VehicleService(true))
+        Group {
+            VehicleView(vehicleService: VehicleService(true))
+                .preferredColorScheme(.dark)
+            VehicleView(vehicleService: VehicleService(true))
+                .preferredColorScheme(.light)
+        }
         
     }
 }

@@ -20,11 +20,10 @@ struct ContentView: View {
         NavigationView {
             VStack {
                 HStack {
+                    Spacer().frame(width: 5)
                     NavigationLink(destination: AuthView(vehicleStore: vehicleService)) {
                         Image(systemName: "gearshape")
-                            .padding()
                     }
-                    Spacer()
                     if let name = vehicleService.nickName {
                         Text(name)
                         Spacer()
@@ -34,12 +33,26 @@ struct ContentView: View {
                             .padding()
                     }
                 }
-                Spacer()
-                VehicleView(vehicleStore: vehicleService)
+                HStack(alignment: .top, spacing: 0) {
+                    Spacer()
+                    VStack(alignment: .trailing) {
+                        if vehicleService.plugState == .pluggedIn {
+                            Spacer().frame(height:155)
+                            ChargeStatusView(vehicleService: vehicleService)
+                        }
+                    }
+                    VehicleView(vehicleService: vehicleService).frame(alignment: .leading)
+                }
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarTitle("")
             .navigationBarHidden(true)
+        }
+        .onAppear {
+            vehicleService.startRefreshTask()
+        }
+        .onDisappear {
+            vehicleService.stopRefreshTask()
         }
     }
 }
